@@ -30,7 +30,7 @@ ruta=""							#
 #  socket="-S /mysql/mysql_files/serv_3306.sock" 	#
 socket=""					   	#
 #						   	#
-# Loguearse automaticamente? yes/no   login="no"	#
+# Loguearse automaticamente? yes/no   logon="no"	#
 logon="no"						#
 #							#
 #########################################################
