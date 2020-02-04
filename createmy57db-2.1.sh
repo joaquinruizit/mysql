@@ -11,15 +11,36 @@
 #################################################
 #
 #								
-user="paco"							
-pass="mypaco1.."
-
-npru=5
-flog="createmy57db.log"						
-ruta="mysql"
-opt=""
+#########################################################
+#	            CONFIGURACIÓN    			#
+#							#
+#  Usuario con privilegios sobre la db			#
+#  user="usuariodb"					#
+user="paco"						#
+#							#
+#  Contraseña del usuario de la db			#
+#  pass="password" 					#
+pass="mypaco1.."					#
+#							#
+#  Ruta de la instancia MySql				#
+#  ruta="/mysql/mysql5725/bin/"				#
+ruta=""							#
+#							#
+#  Opciones de socket					#
+#  socket="-S /mysql/mysql_files/serv_3306.sock" 	#
+socket=""					   	#
+#						   	#
+# Loguearse automaticamente? yes/no   login="no"	#
+logon="no"						#
+#							#
+#########################################################
+#
+#
+#
 dia=$(date +%Y-%m-%d)
 hora=$(date +%H:%M)
+flog="createmy57db.log"						
+npru=3
 if [ ! -d log ]
 then
        	clear	
@@ -50,15 +71,23 @@ exit 1
 fi
 
 flogin() {
+if [ $logon = "no" ]
+then
 	echo -e "Ingrese los datos de autenticación:" "\n"
-	read -e -i "$user" -p "Usuario: " user2
-	user="${user2:-$user}"
+#	read -e -i "$user" -p "Usuario: " user2
+#	user="${user2:-$user}"
+	read -p "Usuario: " user
 	read -p "Contraseña: " -s pass
+elif [ $logon != "yes" ]
+then 
+	echo "Error en la configuración logon"
 	echo ""
+	exit 1
+fi
 }
 fpru() {
 		ftitle
-		$ruta -u$user -p$pass $opt -e "exit"
+		$ruta"mysql" -u$user -p$pass $socket -e "exit"
 		p="$?"
 		ftitle
 		if [ $p = 0 ]  
@@ -68,13 +97,19 @@ fpru() {
 		else	
 			ftitle		
 			echo -e "Quedan $npru intentos." "\n\n"
+			if [ $npru -eq 0 ]
+			then 
+				ftitle
+				ffin
+				exit 1
+			fi
 			let npru-=1
 			flogin
 			fpru
 		fi
 }	
 flistdb() {
- 	$ruta"show" -u$user -p$pass $opt "$db"
+ 	$ruta"mysql""show" -u$user -p$pass $socket "$db"
 	prudb="$?"
 }
 fdb() {
@@ -94,7 +129,7 @@ fdb() {
 		s|S)
 			ftitle
 			echo -e "\nCreando la base de datos '$db' ...."
-			$ruta -u$user -p$pass $opt -e "CREATE DATABASE $db /*!40100 COLLATE 'latin1_spanish_ci' */"	
+			$ruta"mysql" -u$user -p$pass $socket -e "CREATE DATABASE $db /*!40100 COLLATE 'latin1_spanish_ci' */"	
 			flistdb
 			ftitle		
 				if [ $prudb = 0 ]
@@ -102,7 +137,7 @@ fdb() {
 					echo -e "Base de datos creada!!!" "\n"
 					echo $dia";"$hora";"$user";"$db >> "log/$flog.csv"
 					echo $dia $hora $user" Newdb:"$db >> "log/$flog"
-					$ruta -u$user -p$pass $opt -e "show databases like '$db'"
+					$ruta"mysql" -u$user -p$pass $socket -e "show databases like '$db'"
 					read -p "Presione cualquier teclar para continuar..." d
 				else
 					read -p "Error en la creacion de la base de datos." "Presione cualquier tecla para continuar." d
@@ -116,7 +151,7 @@ fdb() {
 			esac	
 		done
 	else
-		$ruta -u$user -p$pass $opt -e "show databases like '$db'"
+		$ruta"mysql" -u$user -p$pass $socket -e "show databases like '$db'"
 		echo -e "\n" "Base de datos existente!!!" "\n\n Ingrese un nombre distinto para la nueva base de datos." "\n"
 		fdb
 	fi
@@ -144,19 +179,19 @@ fasig() {
 		s|S)
 			ftitle
 			echo GRANT USAGE ON "*.*" TO "'"$newuser"'@'"$newhost"';"
-			$ruta -u$user -p$pass $opt -e "grant usage on *.* to '$newuser'@'$newhost'"
+			$ruta"mysql" -u$user -p$pass $socket -e "grant usage on *.* to '$newuser'@'$newhost'"
 			echo -e"\n"
 			echo GRANT $userperm ON $db TO "'"$newuser"'@'"$newhost"';"
-			$ruta -u$user -p$pass $opt -e "grant $userperm on $db .* to '$newuser'@'$newhost'"
+			$ruta"mysql" -u$user -p$pass $socket -e "grant $userperm on $db .* to '$newuser'@'$newhost'"
 			echo -e"\n"
 			echo "set old passwords=FALSE"
-			$ruta -u$user -p$pass $opt -e "set old_passwords=FALSE"
+			$ruta"mysql" -u$user -p$pass $socket -e "set old_passwords=FALSE"
 			echo -e"\n"
 			echo set password for "'"$newuser"'@'"$newhost"'" = password"('****');"
-			$ruta -u$user -p$pass $opt -e "set password for '$newuser'@'$newhost' = password('$newpass')"
+			$ruta"mysql" -u$user -p$pass $socket -e "set password for '$newuser'@'$newhost' = password('$newpass')"
 			echo "\n"
 			echo -e "FLUSH PRIVILEGES;""\n"
-			$ruta -u$user -p$pass $opt -e "FLUSH PRIVILEGES"	
+			$ruta"mysql" -u$user -p$pass $socket -e "FLUSH PRIVILEGES"	
 			fmenu;;
 		n|N)
 			ftitle
