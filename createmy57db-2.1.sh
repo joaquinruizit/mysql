@@ -69,7 +69,6 @@ then
 	fi
 exit 1
 fi
-
 flogin() {
 if [ $logon = "no" ]
 then
@@ -255,10 +254,10 @@ ftitle(){
 }
 ffin(){ 
 	echo ""
-	echo "   ____________________________" 
-	echo "  |  Universidad de los Andes  |" 
-	echo "  |      Bogotá Colombia       |" 
-	echo "  |____________________________|" 
+	echo "	 	   ____________________________" 
+	echo "  	  |  Universidad de los Andes  |" 
+	echo "  	  |      Bogotá Colombia       |" 
+	echo "  	  |____________________________|" 
 	echo -e "\n"
 }
 fmenu() {
