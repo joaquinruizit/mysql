@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+#
 ###########-----createmy57db-2.1-----############
 #						#
 #      		Creado por 			#
@@ -16,11 +17,11 @@
 #							#
 #  Usuario con privilegios sobre la db			#
 #  user="usuariodb"					#
-user="paco"						#
+user="usuario"						#
 #							#
 #  Contraseña del usuario de la db			#
 #  pass="password" 					#
-pass="mypaco1.."					#
+pass="passwd"					#
 #							#
 #  Ruta de la instancia MySql				#
 #  ruta="/mysql/mysql5725/bin/"				#
